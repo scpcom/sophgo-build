@@ -184,7 +184,7 @@ config CROSS_COMPILE_SDK
 config MW_VER
 	string
 	default "v1" if CHIP_ARCH_cv183x || CHIP_ARCH_cv182x
-	default "v2" if CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	default "v2" if CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	help
 	  Set middleware version.
 
@@ -207,17 +207,6 @@ config STATIC
 	  Static binaries are larger, but do not require functioning
 	  dynamic libraries to be present, which is important if used
 	  as a system rescue tool.
-
-config BUILD_FOR_DEBUG
-	bool "Build SDK with debug config"
-	default y
-	help
-	  This configuration is only valid for uboot and kernel.
-	  If you want to build SDK for release,please set BUILD_FOR_DEBUG=n.
-	  "y":build kernel with DEBUG config(such as CONFIG_DEBUG_FS,CONFIG_DEBUG_INFO)
-	      build uboot with commands(such as 'ping','echo','tftp').
-	  "n":build kernel with release config(disable CONFIG_DEBUG_FS and so on)
-	      build uboot without commands.
 
 config ENABLE_SDK_ASAN
 	bool "Enable SDK sanitizer"
@@ -319,24 +308,20 @@ config MULTI_FIP
 	help
 	  "y" Enable multi FIP binary support
 
-config FIP_V1
-    def_bool y
-    depends on CHIP_ARCH_cv183x || CHIP_ARCH_cv182x
-
 config FIP_V2
     def_bool y
-    depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+    depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 
 config OD_CLK_SEL
 	bool "Select to build fip.bin with OD(overdrive) clock setting"
-	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	default n
 	help
 	  "y" Select to build fip.bin with OD(overdrive) clock setting
 
 config VC_CLK_OVERDRIVE
 	bool "Select to build fip.bin with VC clock overdrived setting"
-	depends on CHIP_ARCH_cv181x && !OD_CLK_SEL
+	depends on (CHIP_ARCH_cv181x || CHIP_ARCH_sg200x) && !OD_CLK_SEL
 	default n
 	help
 	  "y" Select to build fip.bin with VC clock overdrived setting
@@ -501,12 +486,6 @@ config ROOTFS_OVERLAYFS
 	help
 	  Enable rootfs with overlayfs.
 
-config BUILDROOT_FS
-	bool "Enable buildroot generate rootfs"
-	default n
-	help
-	  Enable buildroot generate rootfs.
-
 config USE_4K_ERASE_SIZE_FOR_JFFS2
 	bool "Use 4K erase size for jffs2 filesystem"
 	default n
@@ -535,7 +514,7 @@ menu "RTOS options"
 
 config ENABLE_FREERTOS
 	bool "Enable FREERTOS"
-	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	default n
 	help
 	  Enable freertos.
@@ -564,48 +543,6 @@ config FAST_IMAGE_TYPE
 		E_FAST_JEPG : 1
 		E_FAST_H264 : 2
 		E_FAST_H265 : 3
-
-choice
-	prompt "Alios source selection"
-	default DISABLE_ALIOS
-	config DISABLE_ALIOS
-		bool "disable alios"
-		help
-			Disable alios update tool
-			We usually choose this configuration
-			This configuration is required to compile the boot kernel uboot
-			This configuration does not support alios upgrades
-	config ENABLE_ALIOS_UPDATE
-		bool "mars/phobos alios update"
-		help
-			Enable alios update tool
-			We don't usually choose this configuration
-			This configuration is required to compile the tools that update mars/phobos alios
-			This configuration does not support booting the kernel
-	config ENABLE_ALIOS
-		bool "mercury alios"
-		help
-			Enable mercury alios update tool
-			We don't usually choose this configuration
-			This configuration is required to compile the tools that update mercury alios
-			This configuration does not support booting the kernel
-endchoice
-
-config ALIOS_SOURCE
-	string
-	default "mars_alios" if ENABLE_ALIOS_UPDATE
-	default "alios" if ENABLE_ALIOS
-	default "" if DISABLE_ALIOS
-	help
-		Select build alios source.
-
-config ALIOS_SOLUTION
-	string
-	default "helloworld" if ENABLE_ALIOS_UPDATE
-	default "cv182x_helloworld" if ENABLE_ALIOS
-	default "" if DISABLE_ALIOS
-	help
-		Select solution to build alios.
 
 endmenu
 

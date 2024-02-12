@@ -1,6 +1,4 @@
 .PHONY: FORCE
-.PHONY: bld bld-clean
-.PHONY: arm-trusted-firmware arm-trusted-firmware-clean
 .PHONY: u-boot u-boot-clean
 .PHONY: rtos rtos-clean
 
@@ -33,20 +31,9 @@ qstrip = $(strip $(subst ",,$(1)))
 # Default actions
 ################################################################################
 NPROC := $(shell nproc)
-FTP_SRV := ftp://10.58.65.3
 
 export CHIP_ARCH_L := $(shell echo $(CHIP_ARCH) | tr A-Z a-z)
 export BORAD_FOLDER_PATH := ${BUILD_PATH}/boards/${CHIP_ARCH_L}/${PROJECT_FULLNAME}
-
-export KEYSERVER := 10.18.98.102
-export KEYSERVER_SSHKEY_PATH := ${ATF_PATH}/tools/build_script/service_sign@cvi_keyserver.pem
-
-export RELEASE_BIN_DIR := $(TOP_DIR)/rel_bin
-export RELEASE_BIN_LICENSE_DIR := ${RELEASE_BIN_DIR}/release_bin_license
-export RELEASE_BIN_ATF_DIR     := ${RELEASE_BIN_DIR}/release_bin_atf
-export RELEASE_BIN_BLD_DIR     := ${RELEASE_BIN_DIR}/release_bin_bld
-export RELEASE_BIN_BLDP_DIR    := ${RELEASE_BIN_DIR}/release_bin_bldp
-export RELEASE_BIN_BLP_DIR     := ${RELEASE_BIN_DIR}/release_bin_blp
 
 ifneq ($(origin OUTPUT_DIR),environment)
     $(error Please execute defconfig/menuconfig/oldconfig first)
@@ -70,11 +57,6 @@ ${OUTPUT_DIR}/elf:
 include scripts/mmap.mk
 
 ################################################################################
-# arm-trusted-firmware and bld
-################################################################################
-include scripts/atf.mk
-
-################################################################################
 # rtos targets
 ################################################################################
 include scripts/rtos.mk
@@ -94,14 +76,10 @@ endif
 # u-boot targets
 ################################################################################
 # configure uboot defconfig
-ifeq ($(CONFIG_BUILD_FOR_DEBUG),y)
-UBOOT_CONFIG_NAME := ${BRAND}_${PROJECT_FULLNAME}_defconfig
-else
-UBOOT_CONFIG_NAME := ${BRAND}_${PROJECT_FULLNAME}_rls_defconfig
-endif
+UBOOT_CONFIG_NAME := ${PROJECT_FULLNAME}_defconfig
 
 ifeq ($(CONFIG_UBOOT_SPL_CUSTOM),y)
-UBOOT-SPL_CONFIG_NAME := ${BRAND}_${PROJECT_FULLNAME}_spl_defconfig
+UBOOT-SPL_CONFIG_NAME := ${PROJECT_FULLNAME}_spl_defconfig
 endif
 
 ifeq (${RELEASE_VERSION},1)
@@ -231,11 +209,7 @@ u-boot-clean:
 # kernel targets
 ################################################################################
 # configure kernel defconfig
-ifeq ($(CONFIG_BUILD_FOR_DEBUG),y)
-KERNEL_CONFIG_NAME := ${BRAND}_${PROJECT_FULLNAME}_defconfig
-else
-KERNEL_CONFIG_NAME := ${BRAND}_${PROJECT_FULLNAME}_rls_defconfig
-endif
+KERNEL_CONFIG_NAME := ${PROJECT_FULLNAME}_defconfig
 
 KERNEL_VERSION ?= -tag-$(shell git -C ${KERNEL_PATH} describe --exact-match HEAD 2>/dev/null)
 
@@ -254,14 +228,19 @@ define copy_ko_action
 	${Q}find ${1} -name '*.ko' -exec cp -f {} ${SYSTEM_OUT_DIR}/ko/ \;
 endef
 
-ifeq ($(CHIP_ARCH),$(filter $(CHIP_ARCH),CV181X CV180X))
+ifeq ($(CHIP_ARCH),$(filter $(CHIP_ARCH),CV181X CV180X SG200X))
 define copy_header_action
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/chip/$(shell echo $(CHIP_CODE) | tr A-Z a-z)/uapi/linux/* ${1}/linux/
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/common/uapi/linux/* ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion_cvitek.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/include/uapi/linux/dma-buf.h ${1}/linux/
 endef
 else
 define copy_header_action
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/vip/chip/$(shell echo $(CHIP_CODE) | tr A-Z a-z)/uapi/* ${1}/linux/
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/base/uapi/* ${1}/linux/
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/uapi/* ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion_cvitek.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/include/uapi/linux/dma-buf.h ${1}/linux/
@@ -458,6 +437,7 @@ kernel-clean:
 	${Q}$(if $(wildcard ${KERNEL_PATH}/${KERNEL_OUTPUT_FOLDER}), rm -rf ${KERNEL_PATH}/${KERNEL_OUTPUT_FOLDER},)
 	${Q}rm -f  ${OUTPUT_DIR}/elf/vmlinux
 	${Q}$(if $(wildcard ${SYSTEM_OUT_DIR}/ko/kernel), rm -rf ${SYSTEM_OUT_DIR}/ko/kernel,)
+	${Q}find ${KERNEL_PATH}/arch/${ARCH}/boot/dts/${BRAND}/ -name "*.dts*" -type l -exec rm -rf {} \;
 
 ifeq ($(CONFIG_TOOLCHAIN_GLIBC_ARM64),y)
 packages_arch := arm64
@@ -555,41 +535,11 @@ define raw2cimg
 	${Q}python3 $(COMMON_TOOLS_PATH)/image_tool/raw2cimg.py $(OUTPUT_DIR)/rawimages/${1} $(OUTPUT_DIR) $(FLASH_PARTITION_XML)
 endef
 
-
-# BR_OVERLAY_DIR
-# BR_ROOTFS_RAWIMAGE
-br-rootfs-prepare:export CROSS_COMPILE_KERNEL=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_KERNEL))
-br-rootfs-prepare:export CROSS_COMPILE_SDK=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_SDK))
-br-rootfs-prepare:
-	$(call print_target)
-	# copy ko and mmf libs
-	${Q}mkdir -p $(BR_OVERLAY_DIR)/mnt/system
-	${Q}cp -arf ${SYSTEM_OUT_DIR}/* $(BR_OVERLAY_DIR)/mnt/system/
-	# strip
-	${Q}find $(BR_OVERLAY_DIR) -name "*.ko" -type f -printf 'striping %p\n' -exec $(CROSS_COMPILE_KERNEL)strip --strip-unneeded {} \;
-	${Q}find $(BR_OVERLAY_DIR) -name "*.so*" -type f -printf 'striping %p\n' -exec $(CROSS_COMPILE_KERNEL)strip --strip-all {} \;
-	${Q}find $(BR_OVERLAY_DIR) -executable -type f ! -name "*.sh" ! -path "*etc*" ! -path "*.ko" -printf 'striping %p\n' -exec $(CROSS_COMPILE_SDK)strip --strip-all {} 2>/dev/null \;
-
-br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_DIR)/output/$(BR_BOARD)
-br-rootfs-pack:
-	$(call print_target)
-	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
-	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR)
-	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
-	# copy rootfs to rawimg dir
-	${Q}cp $(TARGET_OUTPUT_DIR)/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs_ext4.$(STORAGE_TYPE)
-	$(call raw2cimg ,rootfs_ext4.$(STORAGE_TYPE))
-
-ifeq ($(CONFIG_BUILDROOT_FS),y)
-rootfs:br-rootfs-prepare
-rootfs:br-rootfs-pack
-else
 rootfs:rootfs-pack
 rootfs:
 	$(call print_target)
 ifneq ($(STORAGE_TYPE), sd)
 	$(call raw2cimg ,rootfs.$(STORAGE_TYPE))
-endif
 endif
 
 jffs2:
@@ -662,4 +612,3 @@ cfg:cfg-build
 	$(call raw2cimg ,cfg.$(STORAGE_TYPE))
 
 -include riscv.mk
--include alios.mk

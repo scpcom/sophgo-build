@@ -87,13 +87,13 @@
 	};
 
 
-	cv180x_cooling:cv180x_cooling {
+	cooling:cooling {
 		clocks = <&clk CV180X_CLK_C906_0>, <&clk CV180X_CLK_TPU>;
 		clock-names = "clk_cpu", "clk_tpu_axi";
 		dev-freqs = <850000000 500000000>,
 			<425000000 375000000>,
 			<425000000 300000000>;
-		compatible = "cvitek,cv180x-cooling";
+		compatible = "sophgo,cooling";
 		#cooling-cells = <2>;
 	};
 
