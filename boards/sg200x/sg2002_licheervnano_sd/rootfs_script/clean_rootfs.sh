@@ -28,7 +28,7 @@ rm -rf $SYSTEM_DIR/mnt/system/usr/lib/gio
 rm -rf $SYSTEM_DIR/mnt/system/usr/lib/glib*
 rm -rf $SYSTEM_DIR/mnt/system/usr/lib/gstreamer-1.0*
 rm -rf $SYSTEM_DIR/mnt/system/usr/libexec*
-rm -rf $SYSTEM_DIR/mnt/system/usr/bin
+#rm -rf $SYSTEM_DIR/mnt/system/usr/bin
 rm -f $SYSTEM_DIR/mnt/system/usr/lib/libcvimath.so
 rm -f $SYSTEM_DIR/mnt/system/usr/lib/libcviruntime.so
 rm -f $SYSTEM_DIR/mnt/system/usr/lib/libcnpy.so
