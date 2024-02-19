@@ -1,4 +1,10 @@
 #!/bin/bash
+
+if [ -z "${ENABLE_BOOTLOGO}" ]
+then
+    export ENABLE_BOOTLOGO=1 # enable uboot lcd init
+fi
+
 function _build_default_env()
 {
   # Please keep these default value!!!
@@ -11,7 +17,6 @@ function _build_default_env()
   COMPRESSOR=${COMPRESSOR:-xz}
   COMPRESSOR_UBOOT=${COMPRESSOR_UBOOT:-lzma} # or none to disable
   MULTI_PROCESS_SUPPORT=${MULTI_PROCESS_SUPPORT:-0}
-  ENABLE_BOOTLOGO=${ENABLE_BOOTLOGO:-0}
   TPU_REL=${TPU_REL:-0} # TPU release build
   SENSOR=${SENSOR:-sony_imx327}
 }
