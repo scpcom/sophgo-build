@@ -96,6 +96,15 @@
                 goodix,rst-gpio = <&porte 4 0>;
                 status = "okay";
         };
+	hytr: hynitron@5a {
+		compatible = "hynitron,hyn_ts";
+		reg = <0x5a>;
+		hynitron,irq-gpio = <&porte 3 0>;
+		hynitron,reset-gpio = <&porte 4 0>;
+		hynitron,max-touch-number = <5>;
+		hynitron,display-coords = <368 552>;
+                status = "okay";
+	};
 };
 
 &dac {
