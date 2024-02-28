@@ -15,7 +15,6 @@ fi
 
 output_dir=$1
 echo ${output_dir}
-pushd ${output_dir}
 set -eu
 image=`date +%Y%m%d-%H%M`.img
 THISDIR=$(dirname $(realpath $0))
