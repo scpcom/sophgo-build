@@ -809,18 +809,6 @@
 		#thermal-sensor-cells = <1>;
 	};
 
-#if 0
-	cv182x_cooling:cv182x_cooling {
-		clocks = <&clk CV180X_CLK_A53>, <&clk CV180X_CLK_TPU>;
-		clock-names = "clk_a53", "clk_tpu_axi";
-		dev-freqs = <1000000000 750000000>,
-			<500000000 375000000>,
-			<500000000 100000000>;
-		compatible = "cvitek,cv182x-cooling";
-		#cooling-cells = <2>;
-	};
-#endif
-
 	thermal-zones {
 		soc_thermal_0: soc_thermal_0 {
 			polling-delay-passive = <1000>; /* milliseconds */

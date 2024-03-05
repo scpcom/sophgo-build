@@ -184,7 +184,7 @@ config CROSS_COMPILE_SDK
 config MW_VER
 	string
 	default "v1" if CHIP_ARCH_cv183x || CHIP_ARCH_cv182x
-	default "v2" if CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	default "v2" if CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	help
 	  Set middleware version.
 
@@ -229,11 +229,9 @@ config FLASH_SIZE_SHRINK
 
 config CP_EXT_WIRELESS
 	bool "Install the osdrv/extdrv/wireless/*.ko"
-	depends on FLASH_SIZE_SHRINK
 	default n
 	help
-      Install the osdrv/extdrv/wireless/*.ko no matter
-	  FLASH_SIZE_SHRINK is set or not.
+          Install the osdrv/extdrv/wireless/*.ko no matter
 
 config NO_FB
 	bool "Do not compile frame buffer drivers"
@@ -310,18 +308,18 @@ config MULTI_FIP
 
 config FIP_V2
     def_bool y
-    depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+    depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 
 config OD_CLK_SEL
 	bool "Select to build fip.bin with OD(overdrive) clock setting"
-	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	default n
 	help
 	  "y" Select to build fip.bin with OD(overdrive) clock setting
 
 config VC_CLK_OVERDRIVE
 	bool "Select to build fip.bin with VC clock overdrived setting"
-	depends on CHIP_ARCH_cv181x && !OD_CLK_SEL
+	depends on (CHIP_ARCH_cv181x || CHIP_ARCH_sg200x) && !OD_CLK_SEL
 	default n
 	help
 	  "y" Select to build fip.bin with VC clock overdrived setting
@@ -487,10 +485,10 @@ config ROOTFS_OVERLAYFS
 	  Enable rootfs with overlayfs.
 
 config BUILDROOT_FS
-	bool "Enable buildroot generate rootfs"
-	default n
-	help
-	  Enable buildroot generate rootfs.
+        bool "Enable buildroot generate rootfs"
+        default y
+        help
+          Enable buildroot generate rootfs.
 
 config USE_4K_ERASE_SIZE_FOR_JFFS2
 	bool "Use 4K erase size for jffs2 filesystem"
@@ -520,7 +518,7 @@ menu "RTOS options"
 
 config ENABLE_FREERTOS
 	bool "Enable FREERTOS"
-	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x
+	depends on CHIP_ARCH_cv181x || CHIP_ARCH_cv180x || CHIP_ARCH_sg200x
 	default n
 	help
 	  Enable freertos.

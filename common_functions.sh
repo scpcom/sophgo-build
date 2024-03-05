@@ -36,7 +36,7 @@ function create_ramdisk_folder
 
   CHIP_FOLDER_PATH="$RAMDISK_PATH/rootfs/overlay/$CHIP"
   CUST_FOLDER_PATH="$RAMDISK_PATH/rootfs/overlay/$CUST_FOLDER_NAME"
-  SDK_VER_FOLDER_PATH="$RAMDISK_PATH/rootfs/overlay/${CHIP_ARCH_LOWER}_${SDK_VER}"
+  SDK_VER_FOLDER_PATH="$RAMDISK_PATH/rootfs/overlay/${SDK_VER}"
 
   pushd "$BUILD_PATH"
   export RAMDISK_OUTPUT_BASE CHIP_FOLDER_PATH CUST_FOLDER_PATH SDK_VER_FOLDER_PATH
@@ -112,7 +112,7 @@ function pack_rootfs
   CHIP_ARCH_LOWER=$(echo "${CHIP_ARCH}" | tr A-Z a-z)
   CUST_FOLDER_NAME="$PROJECT_FULLNAME"
   CHIP_FOLDER_PATH="$RAMDISK_PATH"/rootfs/overlay/"$CHIP"
-  SDK_VER_FOLDER_PATH="$RAMDISK_PATH"/rootfs/overlay/"${CHIP_ARCH_LOWER}_${SDK_VER}"
+  SDK_VER_FOLDER_PATH="$RAMDISK_PATH"/rootfs/overlay/"${SDK_VER}"
   CUST_FOLDER_PATH="$RAMDISK_PATH"/rootfs/overlay/"$CUST_FOLDER_NAME"
   echo "CUST_FOLDER_NAME = ${CUST_FOLDER_NAME}"
   echo "CHIP_FOLDER_PATH = ${CHIP_FOLDER_PATH}"
@@ -234,18 +234,11 @@ function pack_burn_image
 {(
   pushd "$OUTPUT_DIR"
   [ -d tmp ] && rm -rf tmp
-  [ -d br-rootfs ] && rm -rf br-rootfs && mkdir br-rootfs
-  tar xf $BR_DIR/output/$BR_BOARD/images/rootfs.tar.xz -C br-rootfs
 
-  # genimage
+  # # genimage
   export PATH=${TOP_DIR}/build/tools/common/sd_tools:${PATH}
   export LD_LIBRARY_PATH=$TOP_DIR/build/tools/common/sd_tools/libconfuse/lib:${LD_LIBRARY_PATH}
-
-  image=sophpi-duo-`date +%Y%m%d-%H%M`.img
-  cp $COMMON_TOOLS_PATH/sd_tools/genimage.cfg $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp
-  sed -i 's/sophpi-duo.img/'"$image"'/' $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp
-  genimage --config $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp  --rootpath $OUTPUT_DIR/br-rootfs --inputpath $OUTPUT_DIR --outputpath $OUTPUT_DIR
-
+  $COMMON_TOOLS_PATH/sd_tools/sd_gen_burn_image_rootless.sh $OUTPUT_DIR
   popd
 )}
 

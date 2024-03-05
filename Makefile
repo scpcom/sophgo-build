@@ -228,9 +228,9 @@ define copy_ko_action
 	${Q}find ${1} -name '*.ko' -exec cp -f {} ${SYSTEM_OUT_DIR}/ko/ \;
 endef
 
-ifeq ($(CHIP_ARCH),$(filter $(CHIP_ARCH),CV181X CV180X ATHENA2))
+ifeq ($(CHIP_ARCH),$(filter $(CHIP_ARCH),CV181X CV180X SG200X))
 define copy_header_action
-	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/chip/$(shell echo $(CHIP_ARCH) | tr A-Z a-z)/uapi/linux/* ${1}/linux/
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/chip/$(shell echo $(CHIP_CODE) | tr A-Z a-z)/uapi/linux/* ${1}/linux/
 	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/common/uapi/linux/* ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion_cvitek.h ${1}/linux/
@@ -238,10 +238,9 @@ define copy_header_action
 endef
 else
 define copy_header_action
-	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/vip/chip/$(shell echo $(CHIP_ARCH) | tr A-Z a-z)/uapi/* ${1}/linux/
+	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/vip/chip/$(shell echo $(CHIP_CODE) | tr A-Z a-z)/uapi/* ${1}/linux/
 	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/base/uapi/* ${1}/linux/
 	${Q}cp -r ${OSDRV_PATH}/interdrv/${MW_VER}/include/uapi/* ${1}/linux/
-	${Q}cp ${OSDRV_PATH}/interdrv/${MW_VER}/usb/gadget/function/f_cvg.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/drivers/staging/android/uapi/ion_cvitek.h ${1}/linux/
 	${Q}cp ${KERNEL_PATH}/include/uapi/linux/dma-buf.h ${1}/linux/
@@ -413,7 +412,7 @@ ifeq ($(CONFIG_KERNEL_ENTRY_HACK),y)
 	${Q}sed -i "s/load = <0x0 0x.*>;/load = <0x0 $(CONFIG_KERNEL_ENTRY_HACK_ADDR)>;/g" ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/multi.its
 	${Q}sed -i "s/entry = <0x0 0x.*>;/entry = <0x0 $(CONFIG_KERNEL_ENTRY_HACK_ADDR)>;/g" ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/multi.its
 endif
-	$(COMMON_TOOLS_PATH)/prebuild/mkimage -f ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/multi.its -k $(RAMDISK_PATH)/keys -r ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/boot.itb
+	LD_LIBRARY_PATH=${TOPDIR}/host $(COMMON_TOOLS_PATH)/prebuild/mkimage -f ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/multi.its -k $(RAMDISK_PATH)/keys -r ${RAMDISK_PATH}/${RAMDISK_OUTPUT_FOLDER}/boot.itb
 
 ramboot: kernel-dts
 	$(call print_target)
@@ -438,6 +437,7 @@ kernel-clean:
 	${Q}$(if $(wildcard ${KERNEL_PATH}/${KERNEL_OUTPUT_FOLDER}), rm -rf ${KERNEL_PATH}/${KERNEL_OUTPUT_FOLDER},)
 	${Q}rm -f  ${OUTPUT_DIR}/elf/vmlinux
 	${Q}$(if $(wildcard ${SYSTEM_OUT_DIR}/ko/kernel), rm -rf ${SYSTEM_OUT_DIR}/ko/kernel,)
+	${Q}find ${KERNEL_PATH}/arch/${ARCH}/boot/dts/${BRAND}/ -name "*.dts*" -type l -exec rm -rf {} \;
 
 ifeq ($(CONFIG_TOOLCHAIN_GLIBC_ARM64),y)
 packages_arch := arm64
@@ -554,11 +554,12 @@ br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_DIR)/output/$(BR_BOARD)
 br-rootfs-pack:
 	$(call print_target)
 	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
+	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR)
 	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
 	# copy rootfs to rawimg dir
-	${Q}cp $(TARGET_OUTPUT_DIR)/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs_ext4.$(STORAGE_TYPE)
-	$(call raw2cimg ,rootfs_ext4.$(STORAGE_TYPE))
+	${Q}cp $(BR_DIR)/output/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs.$(STORAGE_TYPE)
+	$(call raw2cimg ,rootfs.$(STORAGE_TYPE))
 
 ifeq ($(CONFIG_BUILDROOT_FS),y)
 rootfs:br-rootfs-prepare
