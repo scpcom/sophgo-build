@@ -28,9 +28,40 @@ void suck_loop(uint64_t loop) {
         }
 }
 
+static inline void user_led_on(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val |= (1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
+static inline void user_led_off(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val &= ~(1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
+static inline void user_led_toggle(void) {
+	uint32_t val;
+
+        val = mmio_read_32(0x03020000);
+        val ^= (1 << 14);
+        mmio_write_32(0x03020000, val);
+}
+
 int cvi_board_init(void)
 {
         uint32_t val;
+
+	// user led
+	mmio_write_32(0x03001038, 0x3); // GPIOA 14 GPIO_MODE
+	val = mmio_read_32(0x03020004); // GPIOA DIR
+        val |= (1 << 14); // output
+        mmio_write_32(0x03020004, val);
+	user_led_toggle();
 
         // wifi power reset
         mmio_write_32(0x0300104C, 0x3); // GPIOA 26
@@ -43,6 +74,7 @@ int cvi_board_init(void)
         mmio_write_32(0x03020000, val);
 
         suck_loop(200);
+	user_led_toggle();
 
         val = mmio_read_32(0x03020000); // signal level
         val |= (1 << 26); // set level to high
@@ -68,15 +100,20 @@ int cvi_board_init(void)
         // lcd reset
         mmio_write_32(0x030010A4, 0x0); // PWRGPIO 0 GPIO_MODE
 
+	user_led_toggle();
         // lcd backlight
         //mmio_write_32(0x030010EC, 0x0); // GPIOB 0 PWM0_BUCK
-        mmio_write_32(0x030010EC, 0x3); // GPIOB 0 GPIO_MODE
+	// for licheervnano alpha
+	val = mmio_read_32(0x03021000); // signal level
+        val |= (1 << 0); // set level to high
+        mmio_write_32(0x03021000, val);
         val = mmio_read_32(0x03021004); // GPIOB DIR
         val |= (1 << 0); // output
         mmio_write_32(0x03021004, val);
-        val = mmio_read_32(0x03021000); // signal level
-        val |= (1 << 0); // set level to high
-        mmio_write_32(0x03021000, val);
+        mmio_write_32(0x030010EC, 0x3); // GPIOB 0 GPIO_MODE
+
+	// for licheervnano beta
+	mmio_write_32(0x030010ac, 0x4); // PWRGPIO 2 PWM 10
 
         // camera function
         mmio_write_32(0x0300116C, 0x5); // RX4N CAM_MCLK0
@@ -91,12 +128,8 @@ int cvi_board_init(void)
         mmio_write_32(0x05027078, 0x11);// Unlock PWR_GPIO[3]
         mmio_write_32(0x0502707c, 0x11);// Unlock PWR_GPIO[4]
 
-        // bitbang i2c for maixcam
-#ifdef MAIXCAM
-        mmio_write_32(0x0300105C, 0x3);// GPIOA 23 GPIO_MODE
-        mmio_write_32(0x03001060, 0x3);// GPIOA 24 GPIO_MODE
-#endif
         // wait hardware bootup
         suck_loop(100);
+	user_led_off();
         return 0;
 }

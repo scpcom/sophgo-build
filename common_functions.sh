@@ -238,12 +238,7 @@ function pack_burn_image
   # # genimage
   export PATH=${TOP_DIR}/build/tools/common/sd_tools:${PATH}
   export LD_LIBRARY_PATH=$TOP_DIR/build/tools/common/sd_tools/libconfuse/lib:${LD_LIBRARY_PATH}
-
-  image=sophpi-duo-`date +%Y%m%d-%H%M`.img
-  cp $COMMON_TOOLS_PATH/sd_tools/genimage.cfg $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp
-  sed -i 's/sophpi-duo.img/'"$image"'/' $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp
-  genimage --config $COMMON_TOOLS_PATH/sd_tools/genimage.cfg.tmp  --rootpath $OUTPUT_DIR/rootfs --inputpath $OUTPUT_DIR --outputpath $OUTPUT_DIR
-
+  $COMMON_TOOLS_PATH/sd_tools/sd_gen_burn_image_rootless.sh $OUTPUT_DIR
   popd
 )}
 

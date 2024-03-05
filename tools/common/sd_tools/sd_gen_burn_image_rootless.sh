@@ -16,7 +16,7 @@ fi
 output_dir=$1
 echo ${output_dir}
 set -eu
-image=`date +%Y%m%d-%H%M`.img
+image=`LC_ALL=C date | tr -d '( ):'`.img
 THISDIR=$(dirname $(realpath $0))
 mkdir -pv ${output_dir}/tmp/
 mkdir -pv ${output_dir}/root/
@@ -29,4 +29,16 @@ cp -fv ${THISDIR}/genimage_rootless.cfg ${output_dir}/genimage.cfg
 sed -i -e "s/duo.img/${image}/g" ${output_dir}/genimage.cfg
 cd ${output_dir}/
 ${THISDIR}/genimage
+echo ""
+echo ""
+echo ""
+echo ""
+echo "--------------->8------------------"
+echo "# please use win32diskimager or dd command write it into sdcard"
+echo ""
+echo ""
+realpath ${output_dir}/images/${image}
+echo ""
+echo ""
+echo "--------------->8------------------"
 exit $?

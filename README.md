@@ -16,7 +16,7 @@
     - [使用镜像](#使用镜像)
     - [使用upgrade zip](#使用upgrade-zip)
 - [常见问题解答](#常见问题解答)
-  - [Git Submodule 拉取失败](#git-submodule-拉取失败)
+  - [脚本拉取失败](#脚本拉取失败)
 - [相关项目](#相关项目)
 - [关于算能](#关于算能)
 - [技术论坛](#技术论坛)
@@ -73,18 +73,15 @@ cmake version 3.27.6
 ```
 
 ## 获取SDK
-- 本 SDK 仓库采用 `submodule` 的方式管理子仓库，在拉取 SDK 时请使用如下的命令：
+- 本 SDK 仓库采用自动化脚本的方式管理子仓库，在拉取 SDK 时请使用如下的命令：
 ```
-git clone https://github.com/sophgo/[path-to-sdk].git --recurse-submodules
+git clone https://github.com/sophgo/sophpi.git -b sg200x-evb
+cd sophpi
+./scripts/repo_clone.sh --gitclone scripts/subtree.xml
 ```
-- 如果您需要各子仓库最新的版本，请使用如下的命令拉取 SDK:
-```
-git clone https://github.com/sophgo/[path-to-sdk].git
-git submodule init
-git submodule update
-```
-- 若以上的两种方式均拉取失败，或者您当前是在 build 项目中查看本文档，您可以单独拉取每个子仓库，详见 [#常见问题解答](#常见问题解答)
+- 若以上的方式拉取失败，或者您当前是在 build 项目中查看本文档，您可以单独拉取每个子仓库，详见 [#常见问题解答](#常见问题解答)
 ## 准备编译工具
+如果您在上一步中没有碰到任何问题，您可以跳过这一步。
 - 获取工具链
 ```
 wget https://sophon-file.sophon.cn/sophon-prod-s3/drive/23/03/07/16/host-tools.tar.gz
@@ -92,14 +89,14 @@ wget https://sophon-file.sophon.cn/sophon-prod-s3/drive/23/03/07/16/host-tools.t
 - 解压工具链并链接到 SDK 目录
 ```
 tar xvf host-tools.tar.gz
-cd [path-to-sdk]/
+cd sophpi/
 ln -s ../host-tools ./
 ```
 
 ## 编译
 - 以 `sg2000_duo_sd`为例，首先切换到 SDK 的根目录：
 ```
-cd [path-to-sdk]/
+cd sophpi/
 ```
 - 使用以下路径启用环境设置脚本：
 ```
@@ -176,20 +173,21 @@ soc_cv1800b_sophpi_duo_sd
 - 等待烧录成功后，拔掉 SD 卡，重新给开发板上电，即可进入系统。
 
 # 常见问题解答
-## Git Submodule 拉取失败
-如果您无法使用 `git submodule` 的方式拉取代码，也可以使用如下命令分别拉取各个子仓库：
+## 脚本拉取失败
+如果您无法使用自动化脚本的方式拉取代码，也可以使用如下命令分别拉取各个子仓库：
 ```
-mkdir [path-to-sdk] && cd [path-to-sdk]
+mkdir sophpi -p && cd sophpi
 git clone https://github.com/sophgo/build -b sg200x-dev
 git clone https://github.com/sophgo/freertos -b sg200x-dev
+git clone https://github.com/sophgo/FreeRTOS-Kernel -b sg200x-dev freertos/Source
+git clone https://github.com/sophgo/Lab-Project-FreeRTOS-POSIX -b sg200x-dev freertos/Source/FreeRTOS-Plus-POSIX
 git clone https://github.com/sophgo/fsbl -b sg200x-dev
-git clone https://github.com/sophgo/install -b sg200x-dev
 git clone https://github.com/sophgo/isp_tuning -b sg200x-dev
 git clone https://github.com/sophgo/linux_5.10 -b sg200x-dev
 git clone https://github.com/sophgo/middleware -b sg200x-dev
 git clone https://github.com/sophgo/opensbi -b sg200x-dev
 git clone https://github.com/sophgo/osdrv -b sg200x-dev
-git clone https://github.com/sophgo/oss -b sg200x-dev
+git clone https://github.com/sophgo/oss
 git clone https://github.com/sophgo/ramdisk -b sg200x-dev
 git clone https://github.com/sophgo/u-boot-2021.10 -b sg200x-dev
 ```

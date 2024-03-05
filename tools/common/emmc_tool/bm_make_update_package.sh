@@ -178,6 +178,9 @@ function compile_script() {
 	local scr_name=$1
 	local description="$1"
 
+	export PATH=${TOP_DIR}/build/tools/common/prebuild:${PATH}
+	export LD_LIBRARY_PATH=$TOP_DIR/host:${LD_LIBRARY_PATH}
+
 	mkimage -A arm64 -O linux -T script -C none -a 0 -e 0 -n "${description}" \
 		-d ${CURRENT_SCRIPT} ${RECOVERY_DIR}/$scr_name.scr ||
 	panic "failed to compile image for \"${CURRENT_SCRIPT}\""

@@ -16,7 +16,7 @@
     - [Using Image](#using-image)
     - [Using upgrade zip](#using-upgrade-zip)
 - [FAQ](#faq)
-  - [Git Submodule init failed](#git-submodule-init-failed)
+  - [Scripts clone failed](#scripts-clone-failed)
 - [About SOPHGO](#about-sophgo)
   - [Related Efforts](#related-efforts)
 - [Forum](#forum)
@@ -72,20 +72,16 @@ cmake version 3.27.6
 ```
 
 ## Get SDK source code
-- This repository is using `git submodule` for sub-repositories, to get the SDK, using commands below:
+- This repository is using scripts for sub-repositories, to get the SDK, using commands below:
 ```
-git clone https://github.com/sophgo/[path-to-sdk].git --recurse-submodules
+git clone https://github.com/sophgo/sophpi.git -b sg200x-evb
+cd sophpi
+./scripts/repo_clone.sh --gitclone scripts/subtree.xml
 ```
-- If you need the lastest version of these repositories, using these commands instead:
-```
-git clone https://github.com/sophgo/[path-to-sdk].git
-git submodule init
-git submodule update
-```
-- If neither the way works for you, or you are under the `build` repository, please clone these repos one by one, you could check the [#FAQ](#faq) section for more information.
+- If the way above does not working for you, or you are under the `build` repository, please clone these repos one by one, you could check the [#FAQ](#faq) section for more information.
 
 ## Prepare cross-compilation tools
-
+If you did not encountered any issues in the previous step, you can just skip this step.
 - Get the cross-compilation toolchain
 ```
 wget https://sophon-file.sophon.cn/sophon-prod-s3/drive/23/03/07/16/host-tools.tar.gz
@@ -93,14 +89,14 @@ wget https://sophon-file.sophon.cn/sophon-prod-s3/drive/23/03/07/16/host-tools.t
 - Unpack the toolchain and link to the SDK directory
 ```
 tar xvf host-tools.tar.gz
-cd [path-to-sdk]/
+cd sophpi/
 ln -s ../host-tools ./
 ```
 
 ## Compile
 - Take `sg2000_duo_sd` as an example
 ```
-cd [path-to-sdk]/
+cd sophpi/
 ```
 - Enable the `envsetup_soc.sh` script.
 ```
@@ -175,20 +171,21 @@ soc_cv1800b_sophpi_duo_sd
 - After burning successfully finished, unplug the SD card, power on the board again, and enter the system.
 
 # FAQ
-## Git submodule init failed
-If you are unable to clone the repository using `git submodule`, you could clone these repos one by one.
+## Scripts clone failed
+If you are unable to clone the repository using scripts, you could clone these repos one by one.
 ```
-mkdir [path-to-sdk] && cd [path-to-sdk]
+mkdir sophpi -p && cd sophpi
 git clone https://github.com/sophgo/build -b sg200x-dev
 git clone https://github.com/sophgo/freertos -b sg200x-dev
+git clone https://github.com/sophgo/FreeRTOS-Kernel -b sg200x-dev freertos/Source
+git clone https://github.com/sophgo/Lab-Project-FreeRTOS-POSIX -b sg200x-dev freertos/Source/FreeRTOS-Plus-POSIX
 git clone https://github.com/sophgo/fsbl -b sg200x-dev
-git clone https://github.com/sophgo/install -b sg200x-dev
 git clone https://github.com/sophgo/isp_tuning -b sg200x-dev
 git clone https://github.com/sophgo/linux_5.10 -b sg200x-dev
 git clone https://github.com/sophgo/middleware -b sg200x-dev
 git clone https://github.com/sophgo/opensbi -b sg200x-dev
 git clone https://github.com/sophgo/osdrv -b sg200x-dev
-git clone https://github.com/sophgo/oss -b sg200x-dev
+git clone https://github.com/sophgo/oss
 git clone https://github.com/sophgo/ramdisk -b sg200x-dev
 git clone https://github.com/sophgo/u-boot-2021.10 -b sg200x-dev
 ```

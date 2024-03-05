@@ -621,6 +621,7 @@ function build_all()
   pack_data || return $?
   pack_system || return $?
   pack_upgrade || return $?
+  pack_burn_image || return $?
 )}
 
 function clean_all()
@@ -869,6 +870,14 @@ function cvi_setup_env()
       return 1
     fi
   fi
+  export SYSTEM_OUT_DIR
+  export CROSS_COMPILE_PATH
+  # buildroot config
+  export BR_DIR="$TOP_DIR"/buildroot
+  export BR_BOARD=cvitek_${CHIP_ARCH}_${SDK_VER}
+  export BR_OVERLAY_DIR=${BR_DIR}/board/cvitek/${CHIP_ARCH}/overlay
+  export BR_DEFCONFIG=${BR_BOARD}_defconfig
+  echo "BR2_DEFCONFIG:  ${BRDEFCONFIG}"
 }
 
 cvi_print_env()
