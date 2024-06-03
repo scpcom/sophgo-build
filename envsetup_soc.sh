@@ -605,6 +605,7 @@ function build_all()
   pack_rootfs || return $?
   pack_data || return $?
   pack_system || return $?
+  copy_tools || return $?
   pack_upgrade || return $?
   pack_usbdl_image || return $?
   pack_burn_image || return $?
