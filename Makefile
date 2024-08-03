@@ -642,4 +642,3 @@ cfg:cfg-build
 	$(call raw2cimg ,cfg.$(STORAGE_TYPE))
 
 -include riscv.mk
--include alios.mk

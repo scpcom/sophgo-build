@@ -905,7 +905,5 @@ source "$TOP_DIR/build/common_functions.sh"
 #source "$TOP_DIR/build/release_functions.sh"
 # shellcheck source=./riscv_functions.sh
 source "$TOP_DIR/build/riscv_functions.sh"
-# shellcheck source=./alios_functions.sh
-#source "$TOP_DIR/build/alios_functions.sh"
 
 print_usage
