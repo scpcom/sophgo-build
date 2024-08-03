@@ -208,17 +208,6 @@ config STATIC
 	  dynamic libraries to be present, which is important if used
 	  as a system rescue tool.
 
-config BUILD_FOR_DEBUG
-	bool "Build SDK with debug config"
-	default y
-	help
-	  This configuration is only valid for uboot and kernel.
-	  If you want to build SDK for release,please set BUILD_FOR_DEBUG=n.
-	  "y":build kernel with DEBUG config(such as CONFIG_DEBUG_FS,CONFIG_DEBUG_INFO)
-	      build uboot with commands(such as 'ping','echo','tftp').
-	  "n":build kernel with release config(disable CONFIG_DEBUG_FS and so on)
-	      build uboot without commands.
-
 config ENABLE_SDK_ASAN
 	bool "Enable SDK sanitizer"
 	default n
