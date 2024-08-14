@@ -600,6 +600,9 @@ function build_all()
   build_middleware || return $?
   if [ "$TPU_REL" = 1 ]; then
     build_tpu_sdk || return $?
+    build_ive_sdk || return $?
+    build_ivs_sdk || return $?
+    build_ai_sdk  || return $?
   fi
   pack_cfg || return $?
   pack_rootfs || return $?
@@ -753,7 +756,7 @@ function cvi_setup_env()
   CNV_SDK_PATH="$TOP_DIR"/cnv
   ACCESSGUARD_PATH="$TOP_DIR"/access-guard-turnkey
   IPC_APP_PATH="$TOP_DIR"/framework/applications/ipc
-  AI_SDK_PATH="$TOP_DIR"/cviai
+  AI_SDK_PATH="$TOP_DIR"/tdl_sdk
   CVI_PIPELINE_PATH="$TOP_DIR"/cvi_pipeline
   OPENSBI_PATH="$TOP_DIR"/opensbi
   TOOLS_PATH="$BUILD_PATH"/tools
