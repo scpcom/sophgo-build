@@ -734,6 +734,7 @@ function cvi_setup_env()
   export BRAND BUILD_VERBOSE DEBUG PROJECT_FULLNAME
   export OUTPUT_DIR ATF_PATH BM_BLD_PATH OPENSBI_PATH UBOOT_PATH FREERTOS_PATH
   export KERNEL_PATH RAMDISK_PATH OSDRV_PATH TOOLS_PATH COMMON_TOOLS_PATH
+  export INTERDRV_PATH
 
   PROJECT_FULLNAME="$CHIP"_"$BOARD"
 
@@ -778,6 +779,16 @@ function cvi_setup_env()
   ROOTFSTOOL_PATH="$COMMON_TOOLS_PATH"/rootfs_tool
   SPINANDTOOL_PATH="$COMMON_TOOLS_PATH"/spinand_tool
   BOOTLOGO_PATH="$COMMON_TOOLS_PATH"/bootlogo/logo.jpg
+
+  if [ -e "$TOP_DIR"/cvi_mpi/Makefile -a ! -e "$MW_PATH"/Makefile ]; then
+    MW_PATH="$TOP_DIR"/cvi_mpi
+  elif [ -e "$TOP_DIR"/middleware/Makefile -a ! -e "$MW_PATH"/Makefile ]; then
+    MW_PATH="$TOP_DIR"/middleware
+  fi
+  INTERDRV_PATH=${OSDRV_PATH}/interdrv/${MW_VER}
+  if [ -e ${OSDRV_PATH}/interdrv/include -a ! -e ${INTERDRV_PATH}/include ]; then
+    INTERDRV_PATH=${OSDRV_PATH}/interdrv
+  fi
 
   # subfolder path for buidling, chosen accroding to .gitignore rules
   UBOOT_OUTPUT_FOLDER=build/"$PROJECT_FULLNAME"
