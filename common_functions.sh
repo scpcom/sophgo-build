@@ -78,7 +78,7 @@ function build_ramboot
   _build_uboot_env
   _build_kernel_env
   cd "$BUILD_PATH" || return
-  make ramboot
+  make ramboot || return "$?"
 )}
 
 function pack_boot
@@ -125,7 +125,7 @@ function pack_rootfs
   export CHIP_FOLDER_PATH SDK_VER_FOLDER_PATH CUST_FOLDER_PATH
 
   cd "$BUILD_PATH" || return
-  make rootfs
+  make rootfs || return "$?"
 )}
 
 function pack_data
@@ -137,7 +137,7 @@ function pack_data
   mkdir -p "$OUTPUT_DIR"/data
   pushd "$OUTPUT_DIR"/data;echo "If you can dream it, you can do it." > sample;popd
   cd "$BUILD_PATH" || return
-  make jffs2
+  make jffs2 || return "$?"
 )}
 
 function clean_rootfs
@@ -156,7 +156,7 @@ function pack_system
 
   cd "$BUILD_PATH" || return
   if [ "$STORAGE_TYPE" == "emmc" ] || [ "$STORAGE_TYPE" == "spinor" ] || [ "$STORAGE_TYPE" == "spinand" ]; then
-    make system
+    make system || return "$?"
   fi
 )}
 
@@ -169,6 +169,7 @@ function pack_gpt
   pushd "$EMMCTOOL_PATH"
   mkdir -p "$OUTPUT_DIR"/rawimages
   make gpt.img PARTITION_XML="$FLASH_PARTITION_XML" INSTALL_DIR="$OUTPUT_DIR"/rawimages
+  test "$?" -eq 0 || return 1
   python3 "$IMGTOOL_PATH"/raw2cimg.py "$OUTPUT_DIR"/rawimages/gpt.img "$OUTPUT_DIR" "$FLASH_PARTITION_XML"
   popd
 )}
@@ -189,7 +190,7 @@ function pack_cfg
 
   cd "$BUILD_PATH" || return
   if [ $STORAGE_TYPE != "sd" ]; then
-    make cfg
+    make cfg || return "$?"
   fi
 )}
 
@@ -290,7 +291,7 @@ function pack_prog_img
   rm -rf "${tmp_dir:?}/"*
   if [[ "$STORAGE_TYPE" = "spinand" ]]; then
     pushd "$SPINANDTOOL_PATH"/sv_tool
-    make
+    make || return "$?"
     ./create_sv -c 5 -o "$tmp_dir"/sv.bin
     popd
     cp "$OUTPUT_DIR"/rawimages/*."$STORAGE_TYPE" "$tmp_dir"

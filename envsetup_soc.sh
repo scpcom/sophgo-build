@@ -59,7 +59,7 @@ function build_fsbl()
   _build_uboot_env
   _build_opensbi_env
   cd "$BUILD_PATH" || return
-  make fsbl-build
+  make fsbl-build || return "$?"
 )}
 
 function clean_fsbl()
@@ -80,7 +80,7 @@ function build_atf()
   print_notice "Run ${FUNCNAME[0]}() function"
   _build_atf_env
   cd "$BUILD_PATH" || return
-  make arm-trusted-firmware
+  make arm-trusted-firmware || return "$?"
 )}
 
 function clean_atf()
@@ -105,14 +105,14 @@ function build_fip_pre()
   print_notice "Run ${FUNCNAME[0]}() function"
   _build_uboot_env
   cd "$BUILD_PATH" || return
-  make fip-pre-merge
+  make fip-pre-merge || return "$?"
 )}
 
 function build_rtos()
 {(
   print_notice "Run ${FUNCNAME[0]}() function"
   cd "$BUILD_PATH" || return
-  make rtos
+  make rtos || return "$?"
 )}
 
 function clean_rtos()
@@ -146,7 +146,7 @@ function build_uboot()
   _build_opensbi_env
   _link_uboot_logo
   cd "$BUILD_PATH" || return
-  make u-boot
+  make u-boot || return "$?"
 )}
 
 function build_uboot_env_tools()
@@ -154,7 +154,7 @@ function build_uboot_env_tools()
   print_notice "Run ${FUNCNAME[0]}() function"
   _build_uboot_env
   cd "$BUILD_PATH" || return
-  make u-boot-env-tools
+  make u-boot-env-tools || return "$?"
 )}
 
 function clean_uboot()
@@ -212,7 +212,7 @@ function build_bld()
 {(
   print_notice "Run ${FUNCNAME[0]}() function"
   cd "$BUILD_PATH" || return
-  make bld
+  make bld || return "$?"
 )}
 
 function clean_bld()
@@ -233,12 +233,12 @@ function build_middleware()
   _build_middleware_env
   cd "$BUILD_PATH" || return
 
-  make "$ROOTFS_DIR"
+  make "$ROOTFS_DIR" || return "$?"
 
   pushd "$MW_PATH"
   make all -j$(nproc)
   test $? -ne 0 && print_notice "build middleware failed !!" && popd && return 1
-  make install DESTDIR="$SYSTEM_OUT_DIR"
+  make install DESTDIR="$SYSTEM_OUT_DIR" || return "$?"
   popd
 
   # add sdk version
@@ -368,7 +368,7 @@ function clean_sdk()
 function build_ive_sdk()
 {
   if [[ "$CHIP_ARCH" != CV181X ]] ; then
-    build_sdk ive
+    build_sdk ive || return "$?"
   fi
 }
 
@@ -382,7 +382,7 @@ function clean_ive_sdk()
 function build_ivs_sdk()
 {
   if [[ "$CHIP_ARCH" == CV182X ]] || [[ "$CHIP_ARCH" == CV183X ]]; then
-    build_sdk ivs
+    build_sdk ivs || return "$?"
   fi
 }
 
@@ -395,7 +395,7 @@ function clean_ivs_sdk()
 
 function build_ai_sdk()
 {
-  build_sdk ai
+  build_sdk ai || return "$?"
 }
 
 function clean_ai_sdk()
@@ -405,7 +405,7 @@ function clean_ai_sdk()
 
 function build_cnv_sdk()
 {
-  build_sdk cnv
+  build_sdk cnv || return "$?"
 }
 
 function clean_cnv_sdk()
@@ -418,7 +418,7 @@ function build_osdrv()
   print_notice "Run ${FUNCNAME[0]}() ${1} function"
 
   cd "$BUILD_PATH" || return
-  make "$ROOTFS_DIR"
+  make "$ROOTFS_DIR" || return "$?"
 
   local osdrv_target="$1"
   if [ -z "$osdrv_target" ]; then
@@ -454,6 +454,7 @@ function build_cvi_pipeline()
   ./install_base_pkg.sh prebuilt "$(pwd)/install"
   ./download_models.sh "$(pwd)/install/cvi_models"
   make install DESTDIR="$(pwd)/install/system" LIBC_PATH="$TOOLCHAIN_PATH/gcc/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/arm-linux-gnueabihf/libc/lib/"
+  test "$?" -eq 0 || return 1
   popd
 }
 
