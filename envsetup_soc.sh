@@ -484,20 +484,8 @@ function build_3rd_party()
   cp -rpf ${OSS_PATH}/oss_release_tarball/${SDK_VER}/*  ${OSS_TARBALL_PATH}
 
   local oss_list=(
-    "zlib"
-    "glog"
-    "flatbuffers"
-    "opencv"
-    "live555"
-    "sqlite3"
-    "ffmpeg"
-    "thttpd"
-    "openssl"
-    "libwebsockets"
     "json-c"
-    "nanomsg"
     "miniz"
-    "uv"
     "cvi-json-c"
     "cvi-miniz"
   )
