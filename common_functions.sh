@@ -75,6 +75,7 @@ function build_ramboot
 {(
   print_notice "Run ${FUNCNAME[0]}() function"
   create_ramdisk_folder || return "$?"
+  _build_uboot_env
   _build_kernel_env
   cd "$BUILD_PATH" || return
   make ramboot
@@ -87,6 +88,7 @@ function pack_boot
 
   pushd "$RAMDISK_PATH"/"$RAMDISK_OUTPUT_FOLDER"
 
+  _build_uboot_env
   _build_kernel_env
   pushd "$BUILD_PATH"
   make boot || return "$?"
@@ -236,6 +238,7 @@ function pack_burn_image
   [ -d tmp ] && rm -rf tmp
 
   # # genimage
+  export PATH="$BR_DIR"/output/host/bin:"$BR_DIR"/output/host/sbin:${PATH}
   export PATH=${TOP_DIR}/build/tools/common/sd_tools:${PATH}
   export LD_LIBRARY_PATH=$TOP_DIR/build/tools/common/sd_tools/libconfuse/lib:${LD_LIBRARY_PATH}
   $COMMON_TOOLS_PATH/sd_tools/sd_gen_burn_image_rootless.sh $OUTPUT_DIR
