@@ -367,7 +367,7 @@ endif
 
 define gen_cpio
 	cd $(RAMDISK_PATH)/$(RAMDISK_OUTPUT_FOLDER);\
-	$(COMMON_TOOLS_PATH)/gen_init_cpio $(RAMDISK_PATH)/$(RAMDISK_OUTPUT_FOLDER)/../configs/$(1) > $(RAMDISK_PATH)/$(RAMDISK_OUTPUT_FOLDER)/boot.cpio
+	${KERNEL_PATH}/${KERNEL_OUTPUT_FOLDER}/usr/gen_init_cpio $(RAMDISK_PATH)/$(RAMDISK_OUTPUT_FOLDER)/../configs/$(1) > $(RAMDISK_PATH)/$(RAMDISK_OUTPUT_FOLDER)/boot.cpio
 endef
 
 BOOT_IMAGE_ARG :=
