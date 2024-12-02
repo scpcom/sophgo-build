@@ -37,7 +37,7 @@ cp -fv ${THISDIR}/genimage_rootless.cfg ${output_dir}/genimage.cfg
 cp -fv ${THISDIR}/logo.jpeg ${output_dir}/input/logo.jpeg
 sed -i -e "s/duo.img/${image}/g" ${output_dir}/genimage.cfg
 cd ${output_dir}/
-${THISDIR}/genimage
+genimage
 echo ""
 echo ""
 echo ""
