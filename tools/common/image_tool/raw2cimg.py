@@ -147,7 +147,7 @@ def main():
     install_dir = os.path.dirname(args.file_path)
     parts = xmlParser.parse(install_dir)
     storage = xmlParser.getStorage()
-    tmp = TemporaryDirectory()
+    tmp = TemporaryDirectory(dir=args.output_dir)
     imgBuilder = ImagerBuilder(storage, tmp.name)
     for p in parts:
         # Since xml parser will parse with abspath and the user input path can
