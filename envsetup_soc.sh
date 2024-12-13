@@ -467,6 +467,33 @@ function clean_cvi_pipeline()
   popd
 }
 
+function _build_cvi_rtsp_env()
+{
+  export CROSS_COMPILE
+}
+
+function build_cvi_rtsp()
+{(
+  print_notice "Run ${FUNCNAME[0]}() function"
+  _build_cvi_rtsp_env
+
+  cd "$CVI_RTSP_PATH" || return
+  BUILD_SERVICE=1 MW_DIR=${MW_PATH} ./build.sh
+  BUILD_SERVICE=1 make install DESTDIR="$(pwd)/install"
+  make package DESTDIR="$(pwd)/install"
+
+  if [[ "$FLASH_SIZE_SHRINK" != "y" ]]; then
+    BUILD_SERVICE=1 make install DESTDIR="${SYSTEM_OUT_DIR}/usr"
+  fi
+)}
+
+function clean_cvi_rtsp()
+{(
+  print_notice "Run ${FUNCNAME[0]}() function"
+  cd "$CVI_RTSP_PATH" || return
+  BUILD_SERVICE=1 make clean
+)}
+
 function build_3rd_party()
 {
   mkdir -p "$OSS_TARBALL_PATH"
@@ -482,6 +509,7 @@ function build_3rd_party()
   cp -rpf ${OSS_PATH}/oss_release_tarball/${SDK_VER}/*  ${OSS_TARBALL_PATH}
 
   local oss_list=(
+    "live555"
     "json-c"
     "miniz"
     "cvi-json-c"
@@ -759,6 +787,7 @@ function cvi_setup_env()
   IPC_APP_PATH="$TOP_DIR"/framework/applications/ipc
   AI_SDK_PATH="$TOP_DIR"/tdl_sdk
   CVI_PIPELINE_PATH="$TOP_DIR"/cvi_pipeline
+  CVI_RTSP_PATH="$TOP_DIR"/cvi_rtsp
   OPENSBI_PATH="$TOP_DIR"/opensbi
   TOOLS_PATH="$BUILD_PATH"/tools
   COMMON_TOOLS_PATH="$TOOLS_PATH"/common
