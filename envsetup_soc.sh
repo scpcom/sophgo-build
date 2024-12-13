@@ -367,14 +367,14 @@ function clean_sdk()
 
 function build_ive_sdk()
 {
-  if [[ "$CHIP_ARCH" != CV181X ]] ; then
+  if [[ "$CHIP_ARCH" != CV181X ]] && [[ "$CHIP_ARCH" != SG200X ]] ; then
     build_sdk ive || return "$?"
   fi
 }
 
 function clean_ive_sdk()
 {
-  if [[ "$CHIP_ARCH" != CV181X ]] ; then
+  if [[ "$CHIP_ARCH" != CV181X ]] && [[ "$CHIP_ARCH" != SG200X ]] ; then
     clean_sdk ive
   fi
 }
