@@ -367,14 +367,14 @@ function clean_sdk()
 
 function build_ive_sdk()
 {
-  if [[ "$CHIP_ARCH" == CV180X ]] ; then
+  if [[ "$CHIP_ARCH" != CV181X ]] ; then
     build_sdk ive
   fi
 }
 
 function clean_ive_sdk()
 {
-  if [[ "$CHIP_ARCH" == CV180X ]] ; then
+  if [[ "$CHIP_ARCH" != CV181X ]] ; then
     clean_sdk ive
   fi
 }
@@ -395,15 +395,12 @@ function clean_ivs_sdk()
 
 function build_ai_sdk()
 {
-  pushd ${AI_SDK_PATH}
-  mkdir -p ${AI_SDK_INSTALL_PATH}
-  cp -rf ${SDK_VER}/* ${AI_SDK_INSTALL_PATH}/
-  popd
+  build_sdk ai
 }
 
 function clean_ai_sdk()
 {
-	rm -rf ${AI_SDK_INSTALL_PATH}
+    clean_sdk ai
 }
 
 function build_cnv_sdk()
