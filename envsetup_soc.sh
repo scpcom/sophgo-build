@@ -914,6 +914,14 @@ function cvi_setup_env()
   export BR_OVERLAY_DIR=${BR_DIR}/board/cvitek/${CHIP_ARCH}/overlay
   export BR_DEFCONFIG=${BR_BOARD}_defconfig
   echo "BR2_DEFCONFIG:  ${BRDEFCONFIG}"
+
+  # u-boot config
+  export PROJECT_CONFIG_FULLNAME=${BRAND}_${PROJECT_FULLNAME}
+  UBOOT_DEFCONFIG="${BUILD_PATH}/boards/${CHIP_ARCH,,}/${PROJECT_FULLNAME}/u-boot/${PROJECT_CONFIG_FULLNAME}_defconfig"
+  if [ ! -e ${UBOOT_DEFCONFIG} ]; then
+    export PROJECT_CONFIG_FULLNAME=${PROJECT_FULLNAME}
+    UBOOT_DEFCONFIG="${BUILD_PATH}/boards/${CHIP_ARCH,,}/${PROJECT_FULLNAME}/u-boot/${PROJECT_CONFIG_FULLNAME}_defconfig"
+  fi
 }
 
 cvi_print_env()

@@ -76,10 +76,10 @@ endif
 # u-boot targets
 ################################################################################
 # configure uboot defconfig
-UBOOT_CONFIG_NAME := ${PROJECT_FULLNAME}_defconfig
+UBOOT_CONFIG_NAME := ${PROJECT_CONFIG_FULLNAME}_defconfig
 
 ifeq ($(CONFIG_UBOOT_SPL_CUSTOM),y)
-UBOOT-SPL_CONFIG_NAME := ${PROJECT_FULLNAME}_spl_defconfig
+UBOOT-SPL_CONFIG_NAME := ${PROJECT_CONFIG_FULLNAME}_spl_defconfig
 endif
 
 ifeq (${RELEASE_VERSION},1)
@@ -209,7 +209,7 @@ u-boot-clean:
 # kernel targets
 ################################################################################
 # configure kernel defconfig
-KERNEL_CONFIG_NAME := ${PROJECT_FULLNAME}_defconfig
+KERNEL_CONFIG_NAME := ${PROJECT_CONFIG_FULLNAME}_defconfig
 
 KERNEL_VERSION ?= -tag-$(shell git -C ${KERNEL_PATH} describe --exact-match HEAD 2>/dev/null)
 
