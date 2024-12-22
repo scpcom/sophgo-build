@@ -478,7 +478,7 @@ function build_cvi_rtsp()
   _build_cvi_rtsp_env
 
   cd "$CVI_RTSP_PATH" || return
-  BUILD_SERVICE=1 LIVE555_DIR="$TPU_SDK_INSTALL_PATH" MW_DIR=${MW_PATH} ./build.sh
+  BUILD_SERVICE=1 MW_DIR=${MW_PATH} ./build.sh
   BUILD_SERVICE=1 make install DESTDIR="$(pwd)/install"
   make package DESTDIR="$(pwd)/install"
 
@@ -631,7 +631,6 @@ function build_all()
     build_tpu_sdk || return $?
     build_ive_sdk || return $?
     build_ivs_sdk || return $?
-    build_cvi_rtsp || return $?
     build_ai_sdk  || return $?
   fi
   pack_cfg || return $?
@@ -657,7 +656,6 @@ function clean_all()
     clean_ive_sdk
     clean_ivs_sdk
     clean_tpu_sdk
-    clean_cvi_rtsp
     clean_ai_sdk
     clean_cnv_sdk
   fi
