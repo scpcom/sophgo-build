@@ -254,7 +254,7 @@ function pack_burn_image
   [ -d tmp ] && rm -rf tmp
 
   # # genimage
-  export PATH="$BR_DIR"/output/host/bin:"$BR_DIR"/output/host/sbin:${PATH}
+  export PATH="$BR_OUTPUT_DIR"/host/bin:"$BR_OUTPUT_DIR"/host/sbin:${PATH}
   export PATH=${TOP_DIR}/build/tools/common/sd_tools:${PATH}
   export LD_LIBRARY_PATH=$TOP_DIR/build/tools/common/sd_tools/libconfuse/lib:${LD_LIBRARY_PATH}
   $COMMON_TOOLS_PATH/sd_tools/sd_gen_burn_image_rootless.sh $OUTPUT_DIR

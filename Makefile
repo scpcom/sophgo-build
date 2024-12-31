@@ -530,7 +530,7 @@ else
 	${Q}mksquashfs $(ROOTFS_DIR) $(OUTPUT_DIR)/rawimages/rootfs.sqsh -root-owned -comp xz -e mnt/cfg/*
 endif
 ifeq ($(STORAGE_TYPE),spinand)
-	${Q}python3 $(COMMON_TOOLS_PATH)/spinand_tool/mkubiimg.py --ubionly $(FLASH_PARTITION_XML) ROOTFS $(OUTPUT_DIR)/rawimages/rootfs.sqsh $(OUTPUT_DIR)/rawimages/rootfs.spinand -b $(CONFIG_NANDFLASH_BLOCKSIZE) -p $(CONFIG_NANDFLASH_PAGESIZE) --mkfs $(BR_DIR)/output/host/sbin/mkfs.ubifs --ubinize $(BR_DIR)/output/host/sbin/ubinize
+	${Q}python3 $(COMMON_TOOLS_PATH)/spinand_tool/mkubiimg.py --ubionly $(FLASH_PARTITION_XML) ROOTFS $(OUTPUT_DIR)/rawimages/rootfs.sqsh $(OUTPUT_DIR)/rawimages/rootfs.spinand -b $(CONFIG_NANDFLASH_BLOCKSIZE) -p $(CONFIG_NANDFLASH_PAGESIZE) --mkfs $(BR_OUTPUT_DIR)/host/sbin/mkfs.ubifs --ubinize $(BR_OUTPUT_DIR)/host/sbin/ubinize
 	${Q}rm $(OUTPUT_DIR)/rawimages/rootfs.sqsh
 else
 	${Q}mv $(OUTPUT_DIR)/rawimages/rootfs.sqsh $(OUTPUT_DIR)/rawimages/rootfs.$(STORAGE_TYPE)
@@ -559,7 +559,7 @@ br-rootfs-prepare:
 	${Q}find $(BR_OVERLAY_DIR) -executable -type f ! -name "*.sh" ! -path "*etc*" ! -path "*.ko" -printf 'striping %p\n' -exec $(CROSS_COMPILE_SDK)strip --strip-all {} 2>/dev/null \;
 
 
-br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_DIR)/output/$(BR_BOARD)
+br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
 br-rootfs-pack:
 	$(call print_target)
 	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
@@ -567,8 +567,8 @@ br-rootfs-pack:
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR)
 	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
 	# copy rootfs to rawimg dir
-	${Q}cp $(BR_DIR)/output/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs.$(STORAGE_TYPE)
-	${Q}tar zcvf $(OUTPUT_DIR)/licheervnano-drivers.tar.gz $(BR_DIR)/output/target/mnt
+	${Q}cp $(BR_OUTPUT_DIR)/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs.$(STORAGE_TYPE)
+	${Q}tar zcvf $(OUTPUT_DIR)/licheervnano-drivers.tar.gz $(BR_OUTPUT_DIR)/target/mnt
 	$(call raw2cimg ,rootfs.$(STORAGE_TYPE))
 
 ifeq ($(CONFIG_BUILDROOT_FS),y)
@@ -586,11 +586,11 @@ endif
 jffs2:
 	$(call print_target)
 ifeq ($(STORAGE_TYPE),spinor)
-	#chmod 777 $(BR_DIR)/output/host/sbin/mkfs.jffs2
+	#chmod 777 $(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2
 ifeq (${CONFIG_USE_4K_ERASE_SIZE_FOR_JFFS2},y)
-	${Q}$(BR_DIR)/output/host/sbin/mkfs.jffs2 -d $(OUTPUT_DIR)/data -l -e 0x1000 --squash -o $(OUTPUT_DIR)/rawimages/data.spinor
+	${Q}$(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2 -d $(OUTPUT_DIR)/data -l -e 0x1000 --squash -o $(OUTPUT_DIR)/rawimages/data.spinor
 else
-	${Q}$(BR_DIR)/output/host/sbin/mkfs.jffs2 -d $(OUTPUT_DIR)/data -l -e 0x10000 --squash -o $(OUTPUT_DIR)/rawimages/data.spinor
+	${Q}$(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2 -d $(OUTPUT_DIR)/data -l -e 0x10000 --squash -o $(OUTPUT_DIR)/rawimages/data.spinor
 endif
 	$(call raw2cimg ,data.$(STORAGE_TYPE))
 endif
@@ -610,11 +610,11 @@ $(OUTPUT_DIR)/system:
 # Parameters 3: Size for packing (for make_ext4fs)
 ifeq (${STORAGE_TYPE},spinand)
 define pack_image
-	${Q}python3 $(COMMON_TOOLS_PATH)/spinand_tool/mkubiimg.py $(FLASH_PARTITION_XML) $(shell echo ${1} | tr  '[:lower:]' '[:upper:]') ${2} $(OUTPUT_DIR)/rawimages/${1}.spinand -b $(CONFIG_NANDFLASH_BLOCKSIZE) -p $(CONFIG_NANDFLASH_PAGESIZE) --mkfs $(BR_DIR)/output/host/sbin/mkfs.ubifs --ubinize $(BR_DIR)/output/host/sbin/ubinize
+	${Q}python3 $(COMMON_TOOLS_PATH)/spinand_tool/mkubiimg.py $(FLASH_PARTITION_XML) $(shell echo ${1} | tr  '[:lower:]' '[:upper:]') ${2} $(OUTPUT_DIR)/rawimages/${1}.spinand -b $(CONFIG_NANDFLASH_BLOCKSIZE) -p $(CONFIG_NANDFLASH_PAGESIZE) --mkfs $(BR_OUTPUT_DIR)/host/sbin/mkfs.ubifs --ubinize $(BR_OUTPUT_DIR)/host/sbin/ubinize
 endef
 else ifeq (${STORAGE_TYPE},emmc)
 define pack_image
-	${Q}$(BR_DIR)/output/host/bin/make_ext4fs -l ${3}  -L $(shell echo ${1} | tr  '[:lower:]' '[:upper:]') $(OUTPUT_DIR)/rawimages/${1}.emmc ${2}
+	${Q}$(BR_OUTPUT_DIR)/host/bin/make_ext4fs -l ${3}  -L $(shell echo ${1} | tr  '[:lower:]' '[:upper:]') $(OUTPUT_DIR)/rawimages/${1}.emmc ${2}
 	resize2fs -M $(OUTPUT_DIR)/rawimages/${1}.emmc
 endef
 else ifeq (${STORAGE_TYPE},spinor)
