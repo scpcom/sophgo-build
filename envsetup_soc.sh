@@ -912,7 +912,7 @@ function cvi_setup_env()
   export BR_BOARD=cvitek_${CHIP_ARCH}_${SDK_VER}
   export BR_OVERLAY_DIR=${BR_DIR}/board/cvitek/${CHIP_ARCH}/overlay
   export BR_DEFCONFIG=${BR_BOARD}_defconfig
-  echo "BR2_DEFCONFIG:  ${BRDEFCONFIG}"
+  echo "BR_DEFCONFIG: ${BR_DEFCONFIG}"
 
   # u-boot config
   export PROJECT_CONFIG_FULLNAME=${BRAND}_${PROJECT_FULLNAME}
