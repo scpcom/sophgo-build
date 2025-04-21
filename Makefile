@@ -541,6 +541,8 @@ define raw2cimg
 endef
 
 
+BR_PROJECT_OVERLAY_PATH := ${BUILD_PATH}/boards/${CHIP_ARCH_L}/${PROJECT_FULLNAME}/buildroot/overlay
+
 # BR_OVERLAY_DIR
 # BR_ROOTFS_RAWIMAGE
 br-rootfs-prepare:export CROSS_COMPILE_KERNEL=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_KERNEL))
@@ -550,6 +552,7 @@ br-rootfs-prepare:
 	# copy ko and mmf libs
 	${Q}mkdir -p $(BR_OVERLAY_DIR)/mnt/system
 	${Q}cp -arf ${SYSTEM_OUT_DIR}/* $(BR_OVERLAY_DIR)/mnt/system/
+	${Q}[ ! -e $(BR_PROJECT_OVERLAY_PATH)/mnt/system ] || cp -arf $(BR_PROJECT_OVERLAY_PATH)/mnt/system/* $(BR_OVERLAY_DIR)/mnt/system/
 	# copy usr/share/fw_vcodec
 	${Q}mkdir -p $(BR_OVERLAY_DIR)/usr/share
 	${Q}cp -rf $(RAMDISK_PATH)/rootfs/$(ROOTFS_BASE)/usr/share/fw_vcodec $(BR_OVERLAY_DIR)/usr/share
