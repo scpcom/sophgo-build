@@ -549,6 +549,9 @@ br-rootfs-prepare:export CROSS_COMPILE_KERNEL=$(patsubst "%",%,$(CONFIG_CROSS_CO
 br-rootfs-prepare:export CROSS_COMPILE_SDK=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_SDK))
 br-rootfs-prepare:
 	$(call print_target)
+	# copy init scripts
+	${Q}mkdir -p $(BR_OVERLAY_DIR)/etc/init.d
+	${Q}[ ! -e $(BR_PROJECT_OVERLAY_PATH)/etc/init.d ] || cp -arf $(BR_PROJECT_OVERLAY_PATH)/etc/init.d/* $(BR_OVERLAY_DIR)/etc/init.d/
 	# copy ko and mmf libs
 	${Q}mkdir -p $(BR_OVERLAY_DIR)/mnt/system
 	${Q}cp -arf ${SYSTEM_OUT_DIR}/* $(BR_OVERLAY_DIR)/mnt/system/
