@@ -497,6 +497,11 @@ function clean_cvi_rtsp()
 
 function build_3rd_party()
 {
+  if [ -d "${MW_PATH}/3rdparty/tmp" ]; then
+    mkdir -p "${OSS_PATH}/oss_release_tarball/${SDK_VER}"
+    cp -rpf ${MW_PATH}/3rdparty/tmp/*/output/*.tar.gz ${OSS_PATH}/oss_release_tarball/${SDK_VER}/
+  fi
+
   mkdir -p "$OSS_TARBALL_PATH"
 
   if [ -d "${OSS_PATH}/oss_release_tarball" ]; then
@@ -626,8 +631,8 @@ function build_all()
   build_kernel || return $?
   build_ramboot || return $?
   build_osdrv || return $?
-  build_3rd_party || return $?
   build_middleware || return $?
+  build_3rd_party || return $?
   if [ "$TPU_REL" = 1 ]; then
     build_tpu_sdk || return $?
     build_ive_sdk || return $?
