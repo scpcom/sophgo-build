@@ -497,13 +497,13 @@ function clean_cvi_rtsp()
 
 function build_3rd_party()
 {
-  if [ -d "${MW_PATH}/3rdparty/tmp" ]; then
-    mkdir -p "${OSS_PATH}/oss_release_tarball/${SDK_VER}"
-    cp -rpf ${MW_PATH}/3rdparty/tmp/*/output/*.tar.gz ${OSS_PATH}/oss_release_tarball/${SDK_VER}/
+  if [ -e "${MW_PATH}/3rdparty/oss/run_build.sh" -a ! -e ${OSS_PATH}/run_build.sh ]; then
+    mkdir -p "${OSS_PATH}"
+    cp -p "${MW_PATH}/3rdparty/oss/run_build.sh" "${OSS_PATH}/"
   fi
-  if [ -d "${MW_PATH}/modules/bin/tmp_3rd" ]; then
-    mkdir -p ${OSS_PATH}/oss_release_tarball/${SDK_VER}
-    cp -rpf ${MW_PATH}/modules/bin/tmp_3rd/*/output/*.tar.gz ${OSS_PATH}/oss_release_tarball/${SDK_VER}/
+  if [ -d "${MW_PATH}/3rdparty/oss/oss_release_tarball/${SDK_VER}" ]; then
+    mkdir -p "${OSS_PATH}/oss_release_tarball/${SDK_VER}"
+    cp -rpf "${MW_PATH}/3rdparty/oss/oss_release_tarball/${SDK_VER}"/*.tar.gz "${OSS_PATH}/oss_release_tarball/${SDK_VER}/"
   fi
 
   mkdir -p "$OSS_TARBALL_PATH"
