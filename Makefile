@@ -647,7 +647,7 @@ $(ROOTFS_DIR)/mnt/cfg:
 $(ROOTFS_DIR)/mnt/cfg/secure.img:$(ROOTFS_DIR)/mnt/cfg
 	# Create image for encrypting.
 	${Q}dd if=/dev/zero of=$(ROOTFS_DIR)/mnt/cfg/secure.img bs=5M count=1
-	$(TOOLS_PATH)/common/prebuild/mke2fs -T ext4 -O encrypt $(ROOTFS_DIR)/mnt/cfg/secure.img
+	$(BR_OUTPUT_DIR)/host/sbin/mke2fs -T ext4 -O encrypt $(ROOTFS_DIR)/mnt/cfg/secure.img
 
 cfg-build:$(ROOTFS_DIR)/mnt/cfg/secure.img
 cfg-build:
