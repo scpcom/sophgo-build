@@ -1,6 +1,7 @@
 {
 	"panel_list" : {
 		"mipi" : [
+			"d240si31",
 			"zct2133v1",
 			"hx8394",
 			"ili9881c",
