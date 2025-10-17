@@ -236,7 +236,7 @@ function build_middleware()
   make "$ROOTFS_DIR" || return "$?"
 
   pushd "$MW_PATH"
-  make all -j$(nproc)
+  make all
   test $? -ne 0 && print_notice "build middleware failed !!" && popd && return 1
   make install DESTDIR="$SYSTEM_OUT_DIR" || return "$?"
   popd
