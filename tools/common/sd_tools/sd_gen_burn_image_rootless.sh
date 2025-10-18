@@ -25,7 +25,9 @@ mkdir -pv ${output_dir}/input/
 mkdir -pv ${output_dir}/input/rawimages/
 cp -fv ${output_dir}/fip.bin ${output_dir}/input/
 cp -fv ${output_dir}/rawimages/boot.sd ${output_dir}/input/rawimages/
-cp -fv ${output_dir}/rawimages/rootfs.sd ${output_dir}/input/
+rm -f ${output_dir}/rootfs.sd
+mv ${output_dir}/rawimages/rootfs.sd ${output_dir}/input/
+rm -f ${output_dir}/usb_dl/rootfs.sd
 touch ${output_dir}/input/usb.dev
 touch ${output_dir}/input/usb.ncm
 touch ${output_dir}/input/usb.rndis

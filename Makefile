@@ -574,6 +574,7 @@ br-rootfs-pack:
 	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
 	# copy rootfs to rawimg dir
 	${Q}cp $(BR_OUTPUT_DIR)/images/rootfs.ext4 $(OUTPUT_DIR)/rawimages/rootfs.$(STORAGE_TYPE)
+	${Q}rm -f $(BR_OUTPUT_DIR)/images/rootfs.ext?
 	${Q}tar zcvf $(OUTPUT_DIR)/licheervnano-drivers.tar.gz $(BR_OUTPUT_DIR)/target/mnt
 	$(call raw2cimg ,rootfs.$(STORAGE_TYPE))
 
