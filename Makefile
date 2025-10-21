@@ -565,11 +565,26 @@ br-rootfs-prepare:
 	${Q}find $(BR_OVERLAY_DIR) -executable -type f ! -name "*.sh" ! -path "*etc*" ! -path "*.ko" -printf 'striping %p\n' -exec $(CROSS_COMPILE_SDK)strip --strip-all {} 2>/dev/null \;
 
 
-br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
-br-rootfs-pack:
+$(BR_OUTPUT_DIR)/host/bin/genimage:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
+$(BR_OUTPUT_DIR)/host/bin/genimage:
+	${Q}$(MAKE) br-rootfs-prepare
+	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
+	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
+	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) host-finalize
+
+br-host-build: $(BR_OUTPUT_DIR)/host/bin/genimage
+	$(call print_target)
+
+br-target-build:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
+br-target-build:
 	$(call print_target)
 	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
+	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) target-finalize
+
+br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
+br-rootfs-pack: br-target-build
+	$(call print_target)
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR)
 	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
 	# copy rootfs to rawimg dir
@@ -579,9 +594,13 @@ br-rootfs-pack:
 	$(call raw2cimg ,rootfs.$(STORAGE_TYPE))
 
 ifeq ($(CONFIG_BUILDROOT_FS),y)
+hostbin:br-host-build
 rootfs:br-rootfs-prepare
 rootfs:br-rootfs-pack
 else
+hostbin:
+	$(call print_target)
+
 rootfs:rootfs-pack
 rootfs:
 	$(call print_target)
@@ -590,7 +609,11 @@ ifneq ($(STORAGE_TYPE), sd)
 endif
 endif
 
-jffs2:
+$(BR_OUTPUT_DIR)/host/sbin/mke2fs: hostbin
+
+$(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2: hostbin
+
+jffs2: $(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2
 	$(call print_target)
 ifeq ($(STORAGE_TYPE),spinor)
 	#chmod 777 $(BR_OUTPUT_DIR)/host/sbin/mkfs.jffs2
@@ -645,7 +668,7 @@ system:
 $(ROOTFS_DIR)/mnt/cfg:
 	${Q}mkdir -p $@
 
-$(ROOTFS_DIR)/mnt/cfg/secure.img:$(ROOTFS_DIR)/mnt/cfg
+$(ROOTFS_DIR)/mnt/cfg/secure.img:$(ROOTFS_DIR)/mnt/cfg $(BR_OUTPUT_DIR)/host/sbin/mke2fs
 	# Create image for encrypting.
 	${Q}dd if=/dev/zero of=$(ROOTFS_DIR)/mnt/cfg/secure.img bs=5M count=1
 	$(BR_OUTPUT_DIR)/host/sbin/mke2fs -T ext4 -O encrypt $(ROOTFS_DIR)/mnt/cfg/secure.img
