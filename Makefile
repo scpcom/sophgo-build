@@ -565,25 +565,28 @@ br-rootfs-prepare:
 	${Q}find $(BR_OVERLAY_DIR) -executable -type f ! -name "*.sh" ! -path "*etc*" ! -path "*.ko" -printf 'striping %p\n' -exec $(CROSS_COMPILE_SDK)strip --strip-all {} 2>/dev/null \;
 
 
+br-source-config:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
+br-source-config:
+	$(call print_target)
+	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
+	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
+
 $(BR_OUTPUT_DIR)/host/bin/genimage:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
 $(BR_OUTPUT_DIR)/host/bin/genimage:
 	${Q}$(MAKE) br-rootfs-prepare
-	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
-	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
+	${Q}$(MAKE) br-source-config
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) host-finalize
 
 br-host-build: $(BR_OUTPUT_DIR)/host/bin/genimage
 	$(call print_target)
 
 br-target-build:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
-br-target-build:
+br-target-build: br-source-config
 	$(call print_target)
-	${Q}$(MAKE) -C $(BR_DIR) $(BR_DEFCONFIG) BR2_TOOLCHAIN_EXTERNAL_PATH=$(CROSS_COMPILE_PATH)
-	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) source
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR) target-finalize
 
 br-rootfs-pack:export TARGET_OUTPUT_DIR=$(BR_OUTPUT_DIR)
-br-rootfs-pack: br-target-build
+br-rootfs-pack: br-source-config
 	$(call print_target)
 	${Q}$(MAKE) -j${NPROC} -C $(BR_DIR)
 	# ${Q}rm -rf $(BR_ROOTFS_DIR)/*
