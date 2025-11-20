@@ -547,6 +547,7 @@ BR_PROJECT_OVERLAY_PATH := ${BUILD_PATH}/boards/${CHIP_ARCH_L}/${PROJECT_FULLNAM
 # BR_ROOTFS_RAWIMAGE
 br-rootfs-prepare:export CROSS_COMPILE_KERNEL=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_KERNEL))
 br-rootfs-prepare:export CROSS_COMPILE_SDK=$(patsubst "%",%,$(CONFIG_CROSS_COMPILE_SDK))
+br-rootfs-prepare:export TPU_SDK_INSTALL_PATH="${TPU_OUTPUT_PATH}"/cvitek_tpu_sdk
 br-rootfs-prepare:
 	$(call print_target)
 	# copy init scripts
@@ -556,6 +557,10 @@ br-rootfs-prepare:
 	${Q}mkdir -p $(BR_OVERLAY_DIR)/mnt/system
 	${Q}cp -arf ${SYSTEM_OUT_DIR}/* $(BR_OVERLAY_DIR)/mnt/system/
 	${Q}[ ! -e $(BR_PROJECT_OVERLAY_PATH)/mnt/system ] || cp -arf $(BR_PROJECT_OVERLAY_PATH)/mnt/system/* $(BR_OVERLAY_DIR)/mnt/system/
+	${Q}[ ! -e ${TPU_SDK_INSTALL_PATH} ] || mkdir -p $(BR_OVERLAY_DIR)/mnt/system/opt/cvitek_tpu_sdk/include
+	${Q}[ ! -e ${TPU_SDK_INSTALL_PATH} ] || mkdir -p $(BR_OVERLAY_DIR)/mnt/system/opt/cvitek_tpu_sdk/lib
+	${Q}[ ! -e ${TPU_SDK_INSTALL_PATH} ] || cp -arf ${TPU_SDK_INSTALL_PATH}/include/* $(BR_OVERLAY_DIR)/mnt/system/opt/cvitek_tpu_sdk/include/
+	${Q}[ ! -e ${TPU_SDK_INSTALL_PATH} ] || cp -arf ${TPU_SDK_INSTALL_PATH}/lib/* $(BR_OVERLAY_DIR)/mnt/system/opt/cvitek_tpu_sdk/lib/
 	# copy usr/share/fw_vcodec
 	${Q}mkdir -p $(BR_OVERLAY_DIR)/usr/share
 	${Q}cp -rf $(RAMDISK_PATH)/rootfs/$(ROOTFS_BASE)/usr/share/fw_vcodec $(BR_OVERLAY_DIR)/usr/share
