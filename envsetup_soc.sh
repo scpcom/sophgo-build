@@ -915,6 +915,7 @@ function cvi_setup_env()
     fi
   fi
   export SYSTEM_OUT_DIR
+  export TPU_OUTPUT_PATH
   export CROSS_COMPILE_PATH
   # buildroot config
   export BR_DIR="$TOP_DIR"/buildroot
