@@ -394,14 +394,53 @@ function clean_ivs_sdk()
   fi
 }
 
+function build_tdl_sdk()
+{
+  print_notice "Run ${FUNCNAME[0]}() function"
+  pushd "$AI_SDK_PATH"
+  AI_SDK_INSTALL_PATH="$AI_SDK_INSTALL_PATH" \
+  ./build_tdl_sdk.sh all
+  test "$?" -ne 0 && print_notice "${FUNCNAME[0]}() failed !!" && popd && return 1
+  popd
+
+  # copy so
+  cp -a "$AI_SDK_INSTALL_PATH"/lib/*.so* "$SYSTEM_OUT_DIR"/lib/
+  # copy sample_xxx
+  mkdir -p "$SYSTEM_OUT_DIR"/usr/bin/"ai"
+  cp -a "$AI_SDK_INSTALL_PATH"/bin/sample_* "$SYSTEM_OUT_DIR"/usr/bin/"ai"
+  cp -a "$AI_SDK_INSTALL_PATH"/_testing/sample_* "$SYSTEM_OUT_DIR"/usr/bin/"ai"
+  cp -a "${AI_SDK_INSTALL_PATH}/sample/3rd/rtsp/lib/libcvi_rtsp.so" "$SYSTEM_OUT_DIR"/lib/
+}
+
+function clean_tdl_sdk()
+{
+  print_notice "Run ${FUNCNAME[0]}() function"
+  pushd "$AI_SDK_PATH"
+  ./build_tdl_sdk.sh clean
+  popd
+
+  rm -rf "$AI_SDK_INSTALL_PATH"
+  rm -rf "$AI_SDK_PATH"/tmp/_deps
+
+  rm -rf "${SYSTEM_OUT_DIR:?}"/usr/bin/"ai"
+}
+
 function build_ai_sdk()
 {
-  build_sdk ai || return "$?"
+  if [ -e "$AI_SDK_PATH"/build_tdl_sdk.sh ]; then
+    build_tdl_sdk
+  else
+    build_sdk ai || return "$?"
+  fi
 }
 
 function clean_ai_sdk()
 {
+  if [ -e "$AI_SDK_PATH"/build_tdl_sdk.sh ]; then
+    clean_tdl_sdk
+  else
     clean_sdk ai
+  fi
 }
 
 function build_cnv_sdk()
