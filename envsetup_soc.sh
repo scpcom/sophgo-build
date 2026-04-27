@@ -411,6 +411,7 @@ function build_tdl_sdk()
   cp -a "$AI_SDK_INSTALL_PATH"/bin/*/sample_* "$SYSTEM_OUT_DIR"/usr/bin/"ai"
   cp -a "$AI_SDK_INSTALL_PATH"/_testing/sample_* "$SYSTEM_OUT_DIR"/usr/bin/"ai"
   cp -a "$AI_SDK_INSTALL_PATH"/sample/3rd/libwebsockets/lib/*.so* "$SYSTEM_OUT_DIR"/lib/
+  cp -a "$AI_SDK_INSTALL_PATH"/sample/3rd/opencv/lib/*.so.* "$SYSTEM_OUT_DIR"/lib/
   cp -a "$AI_SDK_INSTALL_PATH"/sample/3rd/openssl/lib/*.so* "$SYSTEM_OUT_DIR"/lib/
   cp -a "$AI_SDK_INSTALL_PATH"/sample/utils/lib/*.so* "$SYSTEM_OUT_DIR"/lib/
   cp -a "${AI_SDK_INSTALL_PATH}/sample/3rd/rtsp/lib/libcvi_rtsp.so" "$SYSTEM_OUT_DIR"/lib/
